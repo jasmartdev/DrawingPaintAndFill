@@ -8,40 +8,37 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class DrawingView extends View {
 
-    //drawing path
     private Path drawPath;
-    //drawing and canvas paint
     private Paint drawPaint, canvasPaint;
-    //initial color
     private int paintColor = 0xFF660000, paintAlpha = 255;
-    //canvas
     private Canvas drawCanvas;
-    //canvas bitmap
     private Bitmap canvasBitmap;
-    //brush sizes
     private float brushSize, lastBrushSize;
-    //erase flag
     private boolean erase = false;
+    private boolean fill = false;
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setupDrawing();
     }
 
-    //setup drawing
     private void setupDrawing() {
-
-        //prepare for drawing and setup paint stroke properties
         brushSize = getResources().getInteger(R.integer.medium_size);
         lastBrushSize = brushSize;
         drawPath = new Path();
@@ -55,7 +52,6 @@ public class DrawingView extends View {
         canvasPaint = new Paint(Paint.DITHER_FLAG);
     }
 
-    //size assigned to view
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -63,7 +59,6 @@ public class DrawingView extends View {
         drawCanvas = new Canvas(canvasBitmap);
     }
 
-    //draw the view - will be called after touch event
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
@@ -71,20 +66,27 @@ public class DrawingView extends View {
         canvas.drawPath(drawPath, drawPaint);
     }
 
-    //register user touches as drawing action
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float touchX = event.getX();
         float touchY = event.getY();
-        //respond to down, move and up events
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                drawPath.moveTo(touchX, touchY);
+                if (fill) {
+                    FastFloodFill fff = new FastFloodFill(canvasBitmap, canvasBitmap.getPixel((int) touchX, (int) touchY), paintColor);
+                    fff.floodFill((int) touchX, (int) touchY);
+                    break;
+                } else
+                    drawPath.moveTo(touchX, touchY);
                 break;
             case MotionEvent.ACTION_MOVE:
+                if (fill)
+                    break;
                 drawPath.lineTo(touchX, touchY);
                 break;
             case MotionEvent.ACTION_UP:
+                if (fill)
+                    break;
                 drawPath.lineTo(touchX, touchY);
                 drawCanvas.drawPath(drawPath, drawPaint);
                 drawPath.reset();
@@ -92,36 +94,27 @@ public class DrawingView extends View {
             default:
                 return false;
         }
-        //redraw
         invalidate();
         return true;
-
     }
 
-    //update color
     public void setColor(String newColor) {
         invalidate();
-        //check whether color value or pattern name
         if (newColor.startsWith("#")) {
             paintColor = Color.parseColor(newColor);
             drawPaint.setColor(paintColor);
             drawPaint.setShader(null);
         } else {
-            //pattern
             int patternID = getResources().getIdentifier(
                     newColor, "drawable", "com.jasmartdev.drawingpaintandfill");
-            //decode
             Bitmap patternBMP = BitmapFactory.decodeResource(getResources(), patternID);
-            //create shader
             BitmapShader patternBMPshader = new BitmapShader(patternBMP,
                     Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-            //color and shader
             drawPaint.setColor(0xFFFFFFFF);
             drawPaint.setShader(patternBMPshader);
         }
     }
 
-    //set brush size
     public void setBrushSize(float newSize) {
         float pixelAmount = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 newSize, getResources().getDisplayMetrics());
@@ -129,7 +122,6 @@ public class DrawingView extends View {
         drawPaint.setStrokeWidth(brushSize);
     }
 
-    //get and set last brush size
     public void setLastBrushSize(float lastSize) {
         lastBrushSize = lastSize;
     }
@@ -138,28 +130,71 @@ public class DrawingView extends View {
         return lastBrushSize;
     }
 
-    //set erase true or false
     public void setErase(boolean isErase) {
         erase = isErase;
         if (erase) drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         else drawPaint.setXfermode(null);
     }
 
-    //start new drawing
+    public void setFill(boolean isFill) {
+        fill = isFill;
+    }
+
     public void startNew() {
         drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         invalidate();
     }
 
-    //return current alpha
     public int getPaintAlpha() {
         return Math.round((float) paintAlpha / 255 * 100);
     }
 
-    //set alpha
     public void setPaintAlpha(int newAlpha) {
         paintAlpha = Math.round((float) newAlpha / 100 * 255);
         drawPaint.setColor(paintColor);
         drawPaint.setAlpha(paintAlpha);
+    }
+
+    public void drawImg(int drawable) {
+        Rect dest = new Rect(0, 0, getWidth(), getHeight());
+        drawCanvas.drawBitmap(BitmapFactory.decodeResource(getResources(), drawable), null, dest, drawPaint);
+    }
+
+    public void floodFill(Bitmap image, Point node, int targetColor, int replacementColor) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int target = targetColor;
+        int replacement = replacementColor;
+        if (target != replacement) {
+            Queue<Point> queue = new LinkedList<Point>();
+            do {
+                int x = node.x;
+                int y = node.y;
+                while (x > 0 && image.getPixel(x - 1, y) == target) {
+                    x--;
+                }
+                boolean spanUp = false;
+                boolean spanDown = false;
+                while (x < width && image.getPixel(x, y) == target) {
+                    image.setPixel(x, y, replacement);
+                    if (!spanUp && y > 0 && image.getPixel(x, y - 1) == target) {
+                        queue.add(new Point(x, y - 1));
+                        spanUp = true;
+                    } else if (spanUp && y > 0
+                            && image.getPixel(x, y - 1) != target) {
+                        spanUp = false;
+                    }
+                    if (!spanDown && y < height - 1
+                            && image.getPixel(x, y + 1) == target) {
+                        queue.add(new Point(x, y + 1));
+                        spanDown = true;
+                    } else if (spanDown && y < height - 1
+                            && image.getPixel(x, y + 1) != target) {
+                        spanDown = false;
+                    }
+                    x++;
+                }
+            } while ((node = queue.poll()) != null);
+        }
     }
 }

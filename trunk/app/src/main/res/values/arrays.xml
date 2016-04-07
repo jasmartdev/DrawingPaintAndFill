@@ -1,0 +1,8 @@
+<resources>
+    <integer-array name="img_array">
+        <item>@drawable/image1</item>
+        <item>@drawable/image2</item>
+        <item>@drawable/image3</item>
+        <item>@drawable/image4</item>
+    </integer-array>
+</resources>
