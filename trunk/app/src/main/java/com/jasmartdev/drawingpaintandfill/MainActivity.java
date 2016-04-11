@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.Display;
 import android.view.View;
@@ -22,6 +26,10 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 public class MainActivity extends Activity implements OnClickListener {
@@ -29,7 +37,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
     private DrawingView drawView;
 
-    private ImageButton currPaint, draw_btn, fill_btn, erase_btn, new_btn, opacity_btn, open_bg_btn;
+    private ImageButton currPaint, draw_btn, fill_btn, erase_btn, new_btn, opacity_btn, open_bg_btn, save_btn;
 
     private float smallBrush, mediumBrush, largeBrush;
 
@@ -62,6 +70,8 @@ public class MainActivity extends Activity implements OnClickListener {
         opacity_btn.setOnClickListener(this);
         open_bg_btn = (ImageButton) findViewById(R.id.open_bg_btn);
         open_bg_btn.setOnClickListener(this);
+        save_btn = (ImageButton) findViewById(R.id.save_btn);
+        save_btn.setOnClickListener(this);
     }
 
     public void paintClicked(View view) {
@@ -216,9 +226,9 @@ public class MainActivity extends Activity implements OnClickListener {
                 imageView.setId(i);
                 imageView.setPadding(2, 2, 2, 2);
                 Display display = getWindowManager().getDefaultDisplay();
-                int width = ((display.getWidth()*30)/100);
-                int height = ((display.getHeight()*30)/100);
-                LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(width,height);
+                int width = ((display.getWidth() * 30) / 100);
+                int height = ((display.getHeight() * 30) / 100);
+                LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(width, height);
                 imageView.setLayoutParams(parms);
                 imageView.setImageBitmap(BitmapFactory.decodeResource(
                         getResources(), imgs.getResourceId(i, -1)));
@@ -235,6 +245,42 @@ public class MainActivity extends Activity implements OnClickListener {
                     layout.addView(imageView);
             }
             seekDialog.show();
+        } else if (view.getId() == R.id.save_btn) {
+            AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
+            saveDialog.setTitle("Save drawing");
+            saveDialog.setMessage("Save drawing to device Gallery?");
+            saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    drawView.setDrawingCacheEnabled(true);
+                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                    String root = Environment.getExternalStorageDirectory().toString();
+                    File myDir = new File(root + "/drawing");
+                    myDir.mkdirs();
+                    String fname = timeStamp + ".png";
+                    File file = new File(myDir, fname);
+                    if (file.exists()) file.delete();
+                    try {
+                        FileOutputStream out = new FileOutputStream(file);
+                        drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG, 100, out);
+                        out.flush();
+                        out.close();
+                        drawView.destroyDrawingCache();
+                        Toast savedToast = Toast.makeText(getApplicationContext(), "Drawing saved to storage!", Toast.LENGTH_SHORT);
+                        savedToast.show();
+                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + myDir.getAbsolutePath())));
+                    } catch (Exception e) {
+                        Toast unsavedToast = Toast.makeText(getApplicationContext(), "Oops! Drawing could not be saved.", Toast.LENGTH_SHORT);
+                        unsavedToast.show();
+                        e.printStackTrace();
+                    }
+                }
+            });
+            saveDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            saveDialog.show();
         }
     }
 }

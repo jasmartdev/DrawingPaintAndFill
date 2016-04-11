@@ -54,6 +54,13 @@
             android:layout_height="fill_parent"
             android:contentDescription="@string/openbg"
             android:src="@drawable/open_bg" />
+
+        <ImageButton
+            android:id="@+id/save_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:contentDescription="@string/save"
+            android:src="@drawable/save" />
     </LinearLayout>
 
     <com.jasmartdev.drawingpaintandfill.DrawingView
