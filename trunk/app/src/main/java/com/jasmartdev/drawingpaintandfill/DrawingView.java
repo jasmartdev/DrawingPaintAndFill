@@ -24,14 +24,11 @@ import java.util.Queue;
 
 public class DrawingView extends View {
 
-    private Path drawPath;
     private Paint drawPaint, canvasPaint;
-    private int paintColor = 0xFF660000, paintAlpha = 255;
+    private int paintColor = 0xFFFFFFFF;
+    private final int bgColor = 0xFF000000;
     private Canvas drawCanvas;
     private Bitmap canvasBitmap;
-    private float brushSize, lastBrushSize;
-    private boolean erase = false;
-    private boolean fill = false;
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -39,13 +36,9 @@ public class DrawingView extends View {
     }
 
     private void setupDrawing() {
-        brushSize = getResources().getInteger(R.integer.medium_size);
-        lastBrushSize = brushSize;
-        drawPath = new Path();
         drawPaint = new Paint();
         drawPaint.setColor(paintColor);
         drawPaint.setAntiAlias(true);
-        drawPaint.setStrokeWidth(brushSize);
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -62,8 +55,6 @@ public class DrawingView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
-        if (erase) return;
-        canvas.drawPath(drawPath, drawPaint);
     }
 
     @Override
@@ -72,24 +63,11 @@ public class DrawingView extends View {
         float touchY = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (fill) {
-                    FastFloodFill fff = new FastFloodFill(canvasBitmap, canvasBitmap.getPixel((int) touchX, (int) touchY), paintColor);
-                    fff.floodFill((int) touchX, (int) touchY);
+                int color = canvasBitmap.getPixel((int) touchX, (int) touchY);
+                if (color == bgColor)
                     break;
-                } else
-                    drawPath.moveTo(touchX, touchY);
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (fill)
-                    break;
-                drawPath.lineTo(touchX, touchY);
-                break;
-            case MotionEvent.ACTION_UP:
-                if (fill)
-                    break;
-                drawPath.lineTo(touchX, touchY);
-                drawCanvas.drawPath(drawPath, drawPaint);
-                drawPath.reset();
+                FastFloodFill fff = new FastFloodFill(canvasBitmap, color, paintColor);
+                fff.floodFill((int) touchX, (int) touchY);
                 break;
             default:
                 return false;
@@ -100,59 +78,14 @@ public class DrawingView extends View {
 
     public void setColor(String newColor) {
         invalidate();
-        if (newColor.startsWith("#")) {
-            paintColor = Color.parseColor(newColor);
-            drawPaint.setColor(paintColor);
-            drawPaint.setShader(null);
-        } else {
-            int patternID = getResources().getIdentifier(
-                    newColor, "drawable", "com.jasmartdev.drawingpaintandfill");
-            Bitmap patternBMP = BitmapFactory.decodeResource(getResources(), patternID);
-            BitmapShader patternBMPshader = new BitmapShader(patternBMP,
-                    Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-            drawPaint.setColor(0xFFFFFFFF);
-            drawPaint.setShader(patternBMPshader);
-        }
-    }
-
-    public void setBrushSize(float newSize) {
-        float pixelAmount = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                newSize, getResources().getDisplayMetrics());
-        brushSize = pixelAmount;
-        drawPaint.setStrokeWidth(brushSize);
-    }
-
-    public void setLastBrushSize(float lastSize) {
-        lastBrushSize = lastSize;
-    }
-
-    public float getLastBrushSize() {
-        return lastBrushSize;
-    }
-
-    public void setErase(boolean isErase) {
-        erase = isErase;
-        if (erase) drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        else drawPaint.setXfermode(null);
-    }
-
-    public void setFill(boolean isFill) {
-        fill = isFill;
+        paintColor = Color.parseColor(newColor);
+        drawPaint.setColor(paintColor);
+        drawPaint.setShader(null);
     }
 
     public void startNew() {
         drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         invalidate();
-    }
-
-    public int getPaintAlpha() {
-        return Math.round((float) paintAlpha / 255 * 100);
-    }
-
-    public void setPaintAlpha(int newAlpha) {
-        paintAlpha = Math.round((float) newAlpha / 100 * 255);
-        drawPaint.setColor(paintColor);
-        drawPaint.setAlpha(paintAlpha);
     }
 
     public void drawImg(int drawable) {
