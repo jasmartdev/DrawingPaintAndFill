@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="control_icon_size">30dp</dimen>
+    <dimen name="banner_h">30dp</dimen>
+</resources>

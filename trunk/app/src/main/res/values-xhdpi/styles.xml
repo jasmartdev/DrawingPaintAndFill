@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
     <style name="control_button">
         <item name="android:layout_width">@dimen/control_icon_size</item>
         <item name="android:layout_height">@dimen/control_icon_size</item>
@@ -15,11 +16,6 @@
         <item name="android:layout_marginRight">5dp</item>
         <item name="android:strokeColor" tools:targetApi="lollipop">#FF999999</item>
         <item name="android:solidColor">#00000000</item>
-    </style>
-
-    <style name="control_color_icon">
-        <item name="android:layout_width">@dimen/control_icon_size</item>
-        <item name="android:layout_height">@dimen/control_icon_size</item>
     </style>
 
 </resources>

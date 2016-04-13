@@ -1,8 +1,46 @@
 <resources>
-    <integer-array name="img_array">
-        <item>@drawable/image1</item>
-        <item>@drawable/image2</item>
-        <item>@drawable/image3</item>
-        <item>@drawable/image4</item>
+    <string-array name="img_array">
+        <item>Number</item>
+        <item>Alphabet</item>
+    </string-array>
+    <integer-array name="num_array">
+        <item>@drawable/num_0</item>
+        <item>@drawable/num_1</item>
+        <item>@drawable/num_2</item>
+        <item>@drawable/num_3</item>
+        <item>@drawable/num_4</item>
+        <item>@drawable/num_5</item>
+        <item>@drawable/num_6</item>
+        <item>@drawable/num_7</item>
+        <item>@drawable/num_8</item>
+        <item>@drawable/num_9</item>
+        <item>@drawable/num_11</item>
+    </integer-array>
+    <integer-array name="char_array">
+        <item>@drawable/char_a</item>
+        <item>@drawable/char_b</item>
+        <item>@drawable/char_c</item>
+        <item>@drawable/char_d</item>
+        <item>@drawable/char_e</item>
+        <item>@drawable/char_f</item>
+        <item>@drawable/char_g</item>
+        <item>@drawable/char_h</item>
+        <item>@drawable/char_i</item>
+        <item>@drawable/char_j</item>
+        <item>@drawable/char_k</item>
+        <item>@drawable/char_l</item>
+        <item>@drawable/char_m</item>
+        <item>@drawable/char_o</item>
+        <item>@drawable/char_p</item>
+        <item>@drawable/char_q</item>
+        <item>@drawable/char_r</item>
+        <item>@drawable/char_s</item>
+        <item>@drawable/char_t</item>
+        <item>@drawable/char_u</item>
+        <item>@drawable/char_v</item>
+        <item>@drawable/char_w</item>
+        <item>@drawable/char_x</item>
+        <item>@drawable/char_y</item>
+        <item>@drawable/char_z</item>
     </integer-array>
 </resources>

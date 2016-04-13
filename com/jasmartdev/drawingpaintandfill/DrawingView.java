@@ -9,7 +9,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -17,7 +16,7 @@ public class DrawingView extends View {
 
     private Paint drawPaint, canvasPaint;
     private int paintColor = 0xFFFFFFFF;
-    private final int bgColor = Define.BGCOLOR;
+    private final int bgColor = 0xFF000000;
     private Canvas drawCanvas;
     private Bitmap canvasBitmap;
 
@@ -55,16 +54,11 @@ public class DrawingView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 int color = canvasBitmap.getPixel((int) touchX, (int) touchY);
-//                Log.d("Hoang", "color: "+Integer.toHexString(color));
                 if (color == bgColor)
                     break;
                 FastFloodFill fff = new FastFloodFill(canvasBitmap, color, paintColor);
                 fff.floodFill((int) touchX, (int) touchY);
                 break;
-//            case MotionEvent.ACTION_MOVE:
-//                int color2 = canvasBitmap.getPixel((int) touchX, (int) touchY);
-//                Log.d("Hoang", "color2: "+Integer.toHexString(color2));
-//                break;
             default:
                 return false;
         }

@@ -2,7 +2,7 @@ package com.jasmartdev.drawingpaintandfill;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.util.Log;
+import android.graphics.Point;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -15,7 +15,6 @@ public class FastFloodFill {
     protected int[] pixels = null;
     protected int fillColor = 0;
     protected int startColor;
-    private final int bgColor = Define.BGCOLOR;
     protected boolean[] pixelsChecked;
     protected Queue<FloodFillRange> ranges;
 
@@ -70,13 +69,43 @@ public class FastFloodFill {
         pixelsChecked = new boolean[pixels.length];
         ranges = new LinkedList<FloodFillRange>();
     }
+    void FloodFill2(int x, int y)
+    {
+        Point pt = new Point(x, y);
+        Queue<Point> q = new LinkedList<Point>();
+        q.add(pt);
+        while (q.size() > 0) {
+            Point n = q.poll();
+            if (image.getPixel(n.x, n.y) != startColor)
+                continue;
 
+            Point w = n, e = new Point(n.x + 1, n.y);
+
+            while ((w.x > 0) && (image.getPixel(w.x, w.y) == startColor)) {
+                image.setPixel(w.x, w.y, fillColor);
+                if ((w.y > 0) && (image.getPixel(w.x, w.y - 1) == startColor))
+                    q.add(new Point(w.x, w.y - 1));
+                if ((w.y < image.getHeight() - 1) && (image.getPixel(w.x, w.y + 1) == startColor))
+                    q.add(new Point(w.x, w.y + 1));
+
+                w.x--;
+            }
+
+            while ((e.x < image.getWidth() - 1) && (image.getPixel(e.x, e.y) == startColor)) {
+                image.setPixel(e.x, e.y, fillColor);
+                if ((e.y > 0) && (image.getPixel(e.x, e.y - 1) == startColor))
+                    q.add(new Point(e.x, e.y - 1));
+                if ((e.y < image.getHeight() - 1) && (image.getPixel(e.x, e.y + 1) == startColor))
+                    q.add(new Point(e.x, e.y + 1));
+
+                e.x++;
+            }
+        }
+    }
     public void floodFill(int x, int y) {
         prepare();
         int startPixel = pixels[(width * y) + x];
         startColor = startPixel;
-//        Log.d("Hoang", "startColor: " + Integer.toHexString(startColor));
-//        Log.d("Hoang", "fillColor: " + Integer.toHexString(fillColor));
         LinearFill(x, y);
         FloodFillRange range;
         while (ranges.size() > 0) {
@@ -129,7 +158,10 @@ public class FastFloodFill {
     }
 
     protected boolean CheckPixel(int px) {
-        return (bgColor != pixels[px]);
+        return (startColor == pixels[px]);
+    }
+    protected boolean CheckPixel2(int px) {
+        return (0xFF000000 != pixels[px]);
     }
 
     protected class FloodFillRange {
