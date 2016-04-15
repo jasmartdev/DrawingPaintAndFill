@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -111,8 +112,7 @@
                 android:orientation="horizontal">
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FFFFFFFF"
                     android:contentDescription="@string/paint"
@@ -121,8 +121,7 @@
                     android:tag="#FFFFFFFF" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FFFF0000"
                     android:contentDescription="@string/paint"
@@ -131,8 +130,7 @@
                     android:tag="#FFFF0000" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FFFFCC00"
                     android:contentDescription="@string/paint"
@@ -141,8 +139,7 @@
                     android:tag="#FFFFCC00" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF009900"
                     android:contentDescription="@string/paint"
@@ -151,8 +148,7 @@
                     android:tag="#FF009900" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FFFFCC00"
                     android:contentDescription="@string/paint"
@@ -161,8 +157,7 @@
                     android:tag="#FFFFCC00" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF009900"
                     android:contentDescription="@string/paint"
@@ -177,8 +172,7 @@
                 android:orientation="horizontal">
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF0000FF"
                     android:contentDescription="@string/paint"
@@ -187,8 +181,7 @@
                     android:tag="#FF0000FF" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF990099"
                     android:contentDescription="@string/paint"
@@ -197,8 +190,7 @@
                     android:tag="#FF990099" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF660000"
                     android:contentDescription="@string/paint"
@@ -207,8 +199,7 @@
                     android:tag="#FF660000" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF000000"
                     android:contentDescription="@string/paint"
@@ -217,8 +208,7 @@
                     android:tag="#FF010101" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF660000"
                     android:contentDescription="@string/paint"
@@ -227,8 +217,7 @@
                     android:tag="#FF660000" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF000000"
                     android:contentDescription="@string/paint"
@@ -243,8 +232,7 @@
                 android:orientation="horizontal">
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF0000FF"
                     android:contentDescription="@string/paint"
@@ -253,8 +241,7 @@
                     android:tag="#FF0000FF" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF990099"
                     android:contentDescription="@string/paint"
@@ -263,8 +250,7 @@
                     android:tag="#FF990099" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF660000"
                     android:contentDescription="@string/paint"
@@ -273,8 +259,7 @@
                     android:tag="#FF660000" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF000000"
                     android:contentDescription="@string/paint"
@@ -283,8 +268,7 @@
                     android:tag="#FF010101" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF660000"
                     android:contentDescription="@string/paint"
@@ -293,8 +277,7 @@
                     android:tag="#FF660000" />
 
                 <ImageButton
-                    android:layout_width="@dimen/control_icon_size"
-                    android:layout_height="@dimen/control_icon_size"
+                    style="@style/control_color_icon"
                     android:layout_margin="2dp"
                     android:background="#FF000000"
                     android:contentDescription="@string/paint"
@@ -307,6 +290,15 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/banner_h"
-        android:background="@android:color/holo_red_light"></LinearLayout>
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:background="#FFCCCCCC">
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            ads:adSize="BANNER"
+            ads:adUnitId="ca-app-pub-5633074162966218/2553416287"></com.google.android.gms.ads.AdView>
+    </LinearLayout>
 </LinearLayout>
