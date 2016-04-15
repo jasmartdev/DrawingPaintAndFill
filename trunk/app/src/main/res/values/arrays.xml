@@ -14,7 +14,17 @@
         <item>@drawable/num_7</item>
         <item>@drawable/num_8</item>
         <item>@drawable/num_9</item>
+        <item>@drawable/num_10</item>
         <item>@drawable/num_11</item>
+        <item>@drawable/num_12</item>
+        <item>@drawable/num_13</item>
+        <item>@drawable/num_14</item>
+        <item>@drawable/num_15</item>
+        <item>@drawable/num_16</item>
+        <item>@drawable/num_17</item>
+        <item>@drawable/num_18</item>
+        <item>@drawable/num_19</item>
+        <item>@drawable/num_20</item>
     </integer-array>
     <integer-array name="char_array">
         <item>@drawable/char_a</item>
