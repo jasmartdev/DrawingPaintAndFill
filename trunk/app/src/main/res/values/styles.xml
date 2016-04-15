@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
     <style name="control_button">
         <item name="android:layout_width">@dimen/control_icon_size</item>
         <item name="android:layout_height">@dimen/control_icon_size</item>
@@ -20,6 +21,9 @@
     <style name="control_color_icon">
         <item name="android:layout_width">@dimen/control_icon_size</item>
         <item name="android:layout_height">@dimen/control_icon_size</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:src">@drawable/paint</item>
+        <item name="android:contentDescription">@string/paint</item>
     </style>
 
 </resources>
