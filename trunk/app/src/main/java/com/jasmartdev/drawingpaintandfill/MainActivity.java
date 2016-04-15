@@ -3,6 +3,7 @@ package com.jasmartdev.drawingpaintandfill;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.TypedArray;
@@ -19,6 +20,11 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
@@ -31,6 +37,8 @@ public class MainActivity extends Activity implements OnClickListener {
     private DrawingView drawView;
 
     private ImageButton currPaint, btn_new, btn_open_bg, btn_save;
+
+    private InterstitialAd adViewInters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +57,17 @@ public class MainActivity extends Activity implements OnClickListener {
         btn_open_bg.setOnClickListener(this);
         btn_save = (ImageButton) findViewById(R.id.btn_save);
         btn_save.setOnClickListener(this);
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+        adViewInters = new InterstitialAd(this);
+        adViewInters.setAdUnitId("ca-app-pub-5633074162966218/5227681085");
+        adViewInters.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+            }
+        });
     }
 
     public void paintClicked(View view) {
@@ -72,6 +91,13 @@ public class MainActivity extends Activity implements OnClickListener {
                 public void onClick(DialogInterface dialog, int which) {
                     drawView.startNew();
                     dialog.dismiss();
+                    if (!adViewInters.isLoaded()) {
+                        AdRequest adRequest = new AdRequest.Builder().build();
+                        adViewInters.loadAd(adRequest);
+                    }
+                    if (adViewInters.isLoaded()) {
+                        adViewInters.show();
+                    }
                 }
             });
             newDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -82,7 +108,7 @@ public class MainActivity extends Activity implements OnClickListener {
             newDialog.show();
         } else if (view.getId() == R.id.btn_open_bg) {
             final Dialog seekDialog = new Dialog(this);
-            seekDialog.setTitle("Choose background image:");
+            seekDialog.setTitle("Choose image");
             seekDialog.setContentView(R.layout.bgimg_chooser);
             BgImgChooseExpandListAdapter ExpAdapter;
             ArrayList<Group> ExpListItems;
