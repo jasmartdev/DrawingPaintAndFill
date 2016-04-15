@@ -5,4 +5,5 @@
     <string name="fill">Fill</string>
     <string name="openbg">OpenBg</string>
     <string name="paint">Paint</string>
+    <string name="color">Choose Color</string>
 </resources>
