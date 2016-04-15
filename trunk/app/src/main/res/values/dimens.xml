@@ -1,4 +1,5 @@
 <resources>
     <dimen name="control_icon_size">20dp</dimen>
     <dimen name="banner_h">20dp</dimen>
+    <dimen name="drag_distance_x">60dp</dimen>
 </resources>
