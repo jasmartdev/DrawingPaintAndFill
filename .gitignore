@@ -50,3 +50,6 @@ trunk/app/app.iml
 trunk/trunk.iml
 trunk/app/app.iml
 trunk/app/app.iml
+trunk/app/src/androidTest/java/com/jasmartdev/drawingpaintandfill/ApplicationTest.java
+trunk/app/src/main/java/com/jasmartdev/drawingpaintandfill/SlideFragment.java
+trunk/app/src/test/java/com/jasmartdev/drawingpaintandfill/ExampleUnitTest.java
