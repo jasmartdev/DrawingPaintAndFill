@@ -3,7 +3,6 @@ package com.jasmartdev.drawingpaintandfill;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.TypedArray;
@@ -11,6 +10,12 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -31,13 +36,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MainActivity extends Activity implements OnClickListener {
+public class MainActivity extends FragmentActivity implements OnClickListener {
 
 
     private DrawingView drawView;
-
+    private ViewPager mViewPager;
     private ImageButton currPaint, btn_new, btn_open_bg, btn_save;
-
     private InterstitialAd adViewInters;
 
     @Override
@@ -47,7 +51,9 @@ public class MainActivity extends Activity implements OnClickListener {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-        drawView = (DrawingView) findViewById(R.id.drawing);
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(new SamplePagerAdapter(
+                getSupportFragmentManager()));
         LinearLayout paintLayout = (LinearLayout) findViewById(R.id.paint_colors);
         currPaint = (ImageButton) paintLayout.getChildAt(0);
         currPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
@@ -70,7 +76,65 @@ public class MainActivity extends Activity implements OnClickListener {
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("Hoang", "Main onStart");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("Hoang", "Main onRestart()");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("Hoang", "Main onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("Hoang", "Main onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("Hoang", "Main onstop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("Hoang", "Main onDestroy");
+    }
+
+    public class SamplePagerAdapter extends FragmentPagerAdapter {
+
+        public SamplePagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            Log.d("Hoang", "getItem position " + position);
+            Fragment f = new SlideFragment();
+            f.onAttach(getBaseContext());
+            Log.d("Hoang", "getItem f " + f);
+            return f;
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
+        }
+    }
+
     public void paintClicked(View view) {
+        initDraw();
         if (view != currPaint) {
             ImageButton imgView = (ImageButton) view;
             String color = view.getTag().toString();
@@ -83,6 +147,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
     @Override
     public void onClick(View view) {
+        initDraw();
         if (view.getId() == R.id.btn_new) {
             AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
             newDialog.setTitle("New drawing");
@@ -95,7 +160,7 @@ public class MainActivity extends Activity implements OnClickListener {
                         AdRequest adRequest = new AdRequest.Builder().build();
                         adViewInters.loadAd(adRequest);
                     }
-                    if (adViewInters.isLoaded()) {
+                    if ((drawView.getCountNew() % 3 == 0) && adViewInters.isLoaded()) {
                         adViewInters.show();
                     }
                 }
@@ -118,6 +183,13 @@ public class MainActivity extends Activity implements OnClickListener {
             ExpAdapter = new BgImgChooseExpandListAdapter(seekDialog.getContext(), ExpListItems, seekDialog, drawView);
             ExpandList.setAdapter(ExpAdapter);
             seekDialog.show();
+            if (!adViewInters.isLoaded()) {
+                AdRequest adRequest = new AdRequest.Builder().build();
+                adViewInters.loadAd(adRequest);
+            }
+            if ((drawView.getCountNew() % 3 == 0) && adViewInters.isLoaded()) {
+                adViewInters.show();
+            }
         } else if (view.getId() == R.id.btn_save) {
             AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
             saveDialog.setTitle("Save drawing");
@@ -186,5 +258,12 @@ public class MainActivity extends Activity implements OnClickListener {
         gru.setItems(ch_list);
         list.add(gru);
         return list;
+    }
+    private void initDraw()
+    {
+        if (drawView == null) {
+            View v = mViewPager.getChildAt(mViewPager.getCurrentItem());
+            drawView = (DrawingView) v.findViewById(R.id.drawing);
+        }
     }
 }

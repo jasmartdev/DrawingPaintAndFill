@@ -16,8 +16,8 @@
 
     </LinearLayout>
 
-    <com.jasmartdev.drawingpaintandfill.DrawingView
-        android:id="@+id/drawing"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="3dp"
@@ -291,8 +291,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:background="#FFCCCCCC">
+        android:background="#FFCCCCCC"
+        android:gravity="center_horizontal">
 
         <com.google.android.gms.ads.AdView
             android:id="@+id/adView"

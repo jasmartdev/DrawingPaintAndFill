@@ -18,8 +18,13 @@ public class DrawingView extends View {
     private Paint drawPaint, canvasPaint;
     private int paintColor = 0xFFFFFFFF;
     private final int bgColor = Define.BGCOLOR;
+    private int downColor = Define.BGCOLOR, upColor = Define.BGCOLOR;
+    private boolean isDrag = false;
+    private float down_x;
     private Canvas drawCanvas;
     private Bitmap canvasBitmap;
+    private int imgPos = -1;
+    public static int s_CountNew = 0;
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -54,17 +59,19 @@ public class DrawingView extends View {
         float touchY = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                int color = canvasBitmap.getPixel((int) touchX, (int) touchY);
-//                Log.d("Hoang", "color: "+Integer.toHexString(color));
-                if (color == bgColor)
+                downColor = canvasBitmap.getPixel((int) touchX, (int) touchY);
+                down_x = touchX;
+                break;
+            case MotionEvent.ACTION_UP:
+                upColor = canvasBitmap.getPixel((int) touchX, (int) touchY);
+                if (upColor == bgColor)
                     break;
-                FastFloodFill fff = new FastFloodFill(canvasBitmap, color, paintColor);
+                FastFloodFill fff = new FastFloodFill(canvasBitmap, upColor, paintColor);
                 fff.floodFill((int) touchX, (int) touchY);
                 break;
-//            case MotionEvent.ACTION_MOVE:
-//                int color2 = canvasBitmap.getPixel((int) touchX, (int) touchY);
-//                Log.d("Hoang", "color2: "+Integer.toHexString(color2));
-//                break;
+            case MotionEvent.ACTION_MOVE:
+                float dis = getResources().getDimension(R.dimen.drag_distance_x);
+                    break;
             default:
                 return false;
         }
@@ -80,12 +87,27 @@ public class DrawingView extends View {
     }
 
     public void startNew() {
+        s_CountNew++;
         drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         invalidate();
+        Log.d("Hoang", "s_CountNew "+s_CountNew);
     }
 
     public void drawImg(int drawable) {
         Rect dest = new Rect(0, 0, getWidth(), getHeight());
         drawCanvas.drawBitmap(BitmapFactory.decodeResource(getResources(), drawable), null, dest, drawPaint);
+    }
+
+    public void setImgPos(int pos) {
+        imgPos = pos;
+    }
+
+    public int getImgPos() {
+        return imgPos;
+    }
+
+    public int getCountNew()
+    {
+        return s_CountNew;
     }
 }

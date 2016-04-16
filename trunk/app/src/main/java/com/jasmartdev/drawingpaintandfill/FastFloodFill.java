@@ -2,7 +2,7 @@ package com.jasmartdev.drawingpaintandfill;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.util.Log;
+import android.graphics.Point;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -75,8 +75,6 @@ public class FastFloodFill {
         prepare();
         int startPixel = pixels[(width * y) + x];
         startColor = startPixel;
-//        Log.d("Hoang", "startColor: " + Integer.toHexString(startColor));
-//        Log.d("Hoang", "fillColor: " + Integer.toHexString(fillColor));
         LinearFill(x, y);
         FloodFillRange range;
         while (ranges.size() > 0) {
