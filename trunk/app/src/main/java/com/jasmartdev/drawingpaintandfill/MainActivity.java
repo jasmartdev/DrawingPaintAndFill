@@ -38,7 +38,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private DrawingView drawView;
     private DrawPagerAdapter padapter;
     private ViewPager mViewPager;
-    private ImageButton currPaint, btn_new, btn_open_bg, btn_save;
+    private ImageButton currPaint, btn_new, btn_open_bg, btn_save, btn_effect;
     private InterstitialAd adViewInters;
     private int cur_page;
     public static int s_cur_group = 0;
@@ -59,8 +59,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
             @Override
             public void onPageSelected(int position) {
-                
-                if ((drawView.getCountNew() % 3 == 0) && adViewInters.isLoaded()) {
+                initDraw();
+                if ((DrawingView.getCountNew() % 3 == 0) && adViewInters.isLoaded()) {
                     adViewInters.show();
                 }
             }
@@ -74,6 +74,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         btn_open_bg.setOnClickListener(this);
         btn_save = (ImageButton) findViewById(R.id.btn_save);
         btn_save.setOnClickListener(this);
+        btn_effect = (ImageButton) findViewById(R.id.btn_effect);
+        btn_effect.setOnClickListener(this);
         AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
@@ -125,7 +127,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     }
 
     public void paintClicked(View view) {
-        initDraw();
         if (view != currPaint) {
             ImageButton imgView = (ImageButton) view;
             String color = view.getTag().toString();
@@ -138,7 +139,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     @Override
     public void onClick(View view) {
-        initDraw();
         if (view.getId() == R.id.btn_new) {
             AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
             newDialog.setTitle("New drawing");
@@ -187,7 +187,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             saveDialog.setMessage("Save drawing to device Gallery?");
             saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    drawView.setDrawingCacheEnabled(true);
                     String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                     String root = Environment.getExternalStorageDirectory().toString();
                     File myDir = new File(root + "/drawing");
@@ -197,10 +196,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                     if (file.exists()) file.delete();
                     try {
                         FileOutputStream out = new FileOutputStream(file);
-                        drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG, 100, out);
+                        drawView.getCanvasBitmap().compress(Bitmap.CompressFormat.JPEG, 100, out);
                         out.flush();
                         out.close();
-                        drawView.destroyDrawingCache();
                         Toast savedToast = Toast.makeText(getApplicationContext(), "Drawing saved to storage!", Toast.LENGTH_SHORT);
                         savedToast.show();
                         sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + myDir.getAbsolutePath())));
@@ -217,6 +215,29 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 }
             });
             saveDialog.show();
+        } else if (view.getId() == R.id.btn_effect) {
+            final Dialog effectDialog = new Dialog(this);
+            effectDialog.setTitle("Choose effect");
+            effectDialog.setContentView(R.layout.effect_chooser);
+            ImageButton eff1 = (ImageButton) effectDialog.findViewById(R.id.effect_brush1);
+            eff1.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    drawView.setBrush(R.drawable.brush);
+                    drawView.invalidate();
+                    effectDialog.dismiss();
+                }
+            });
+            ImageButton eff2 = (ImageButton) effectDialog.findViewById(R.id.effect_brush2);
+            eff2.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    drawView.setBrush(R.drawable.fill);
+                    drawView.invalidate();
+                    effectDialog.dismiss();
+                }
+            });
+            effectDialog.show();
         }
     }
 
