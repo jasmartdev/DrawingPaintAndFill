@@ -1,6 +1,5 @@
 package com.jasmartdev.drawingpaintandfill;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -10,10 +9,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
@@ -40,9 +36,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
 
     private DrawingView drawView;
+    private DrawPagerAdapter padapter;
     private ViewPager mViewPager;
     private ImageButton currPaint, btn_new, btn_open_bg, btn_save;
     private InterstitialAd adViewInters;
+    private int cur_page;
+    public static int s_cur_group = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +50,21 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+        DrawingView.setupDrawing();
         mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(new SamplePagerAdapter(
-                getSupportFragmentManager()));
+        padapter = new DrawPagerAdapter(getSupportFragmentManager(), this);
+        mViewPager.setAdapter(padapter);
+        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
+        {
+
+            @Override
+            public void onPageSelected(int position) {
+                
+                if ((drawView.getCountNew() % 3 == 0) && adViewInters.isLoaded()) {
+                    adViewInters.show();
+                }
+            }
+        });
         LinearLayout paintLayout = (LinearLayout) findViewById(R.id.paint_colors);
         currPaint = (ImageButton) paintLayout.getChildAt(0);
         currPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
@@ -74,6 +85,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 super.onAdClosed();
             }
         });
+        cur_page = mViewPager.getCurrentItem();
     }
 
     @Override
@@ -110,27 +122,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     protected void onDestroy() {
         super.onDestroy();
         Log.d("Hoang", "Main onDestroy");
-    }
-
-    public class SamplePagerAdapter extends FragmentPagerAdapter {
-
-        public SamplePagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            Log.d("Hoang", "getItem position " + position);
-            Fragment f = new SlideFragment();
-            f.onAttach(getBaseContext());
-            Log.d("Hoang", "getItem f " + f);
-            return f;
-        }
-
-        @Override
-        public int getCount() {
-            return 3;
-        }
     }
 
     public void paintClicked(View view) {
@@ -180,7 +171,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             ExpandableListView ExpandList;
             ExpandList = (ExpandableListView) seekDialog.findViewById(R.id.exp_list);
             ExpListItems = SetStandardGroups();
-            ExpAdapter = new BgImgChooseExpandListAdapter(seekDialog.getContext(), ExpListItems, seekDialog, drawView);
+            ExpAdapter = new BgImgChooseExpandListAdapter(seekDialog.getContext(), ExpListItems, seekDialog, mViewPager, padapter);
             ExpandList.setAdapter(ExpAdapter);
             seekDialog.show();
             if (!adViewInters.isLoaded()) {
@@ -229,41 +220,48 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         }
     }
 
+    public TypedArray getChildImages(int pos) {
+        switch (pos) {
+            case 0:
+                return getResources().obtainTypedArray(R.array.num_array);
+            case 1:
+                return getResources().obtainTypedArray(R.array.char_array);
+            default:
+                return null;
+        }
+    }
+
     public ArrayList<Group> SetStandardGroups() {
 
         String group_names[] = getResources().getStringArray(R.array.img_array);
         ArrayList<Group> list = new ArrayList<Group>();
         ArrayList<Child> ch_list;
-        Group gru = new Group();
-        gru.setName(group_names[0]);
-        TypedArray imgs;
-        imgs = getResources().obtainTypedArray(R.array.num_array);
-        ch_list = new ArrayList<Child>();
-        for (int i = 0; i < imgs.length(); i++) {
-            Child ch = new Child();
-            ch.setImage(imgs.getResourceId(i, -1));
-            ch_list.add(ch);
+        Group gru;
+        for (int i = 0; i < group_names.length; i++) {
+            gru = new Group();
+            gru.setName(group_names[i]);
+            TypedArray imgs;
+            imgs = getChildImages(i);
+            ch_list = new ArrayList<Child>();
+            for (int j = 0; j < imgs.length(); j++) {
+                Child ch = new Child();
+                ch.setImage(imgs.getResourceId(j, -1));
+                ch_list.add(ch);
+            }
+            gru.setItems(ch_list);
+            list.add(gru);
         }
-        gru.setItems(ch_list);
-        list.add(gru);
-        gru = new Group();
-        gru.setName(group_names[1]);
-        imgs = getResources().obtainTypedArray(R.array.char_array);
-        ch_list = new ArrayList<Child>();
-        for (int i = 0; i < imgs.length(); i++) {
-            Child ch = new Child();
-            ch.setImage(imgs.getResourceId(i, -1));
-            ch_list.add(ch);
-        }
-        gru.setItems(ch_list);
-        list.add(gru);
         return list;
     }
-    private void initDraw()
-    {
-        if (drawView == null) {
-            View v = mViewPager.getChildAt(mViewPager.getCurrentItem());
-            drawView = (DrawingView) v.findViewById(R.id.drawing);
+
+    private void initDraw() {
+        Log.d("Hoang", "initDraw drawView:" + drawView + " cur_page " + cur_page + " mViewPager.getCurrentItem() " + mViewPager.getCurrentItem());
+        if (drawView == null || cur_page != mViewPager.getCurrentItem()) {
+            int index = mViewPager.getCurrentItem();
+            SlideFragment sfm = (SlideFragment) padapter.getRegisteredFragment(index);
+            drawView = sfm.getDrawView();
+            cur_page = mViewPager.getCurrentItem();
+            Log.d("Hoang", "initDraw 222 drawView:" + drawView + " sfm " + sfm + " cur_page " + cur_page);
         }
     }
 }

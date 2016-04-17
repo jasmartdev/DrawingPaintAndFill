@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +19,15 @@ public class BgImgChooseExpandListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private ArrayList<Group> groups;
     private Dialog dialog;
-    private DrawingView drawview;
+    private ViewPager viewpage;
+    private DrawPagerAdapter adapter;
 
-    public BgImgChooseExpandListAdapter(Context context, ArrayList<Group> groups, Dialog dialog, DrawingView drawview) {
+    public BgImgChooseExpandListAdapter(Context context, ArrayList<Group> groups, Dialog dialog, ViewPager viewpage, DrawPagerAdapter adapter) {
         this.context = context;
         this.groups = groups;
         this.dialog = dialog;
-        this.drawview = drawview;
+        this.viewpage = viewpage;
+        this.adapter = adapter;
     }
 
     @Override
@@ -39,7 +42,7 @@ public class BgImgChooseExpandListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getChildView(int groupPosition, int childPosition,
+    public View getChildView(int groupPosition, final int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
 
         Child child = (Child) getChild(groupPosition, childPosition);
@@ -57,11 +60,15 @@ public class BgImgChooseExpandListAdapter extends BaseExpandableListAdapter {
                 context.getResources(), child.getImage(), option));
         iv.setScaleType(ImageView.ScaleType.FIT_XY);
         final int img = child.getImage();
+        final int groupPos = groupPosition;
         iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawview.startNew();
-                drawview.drawImg(img);
+                if(MainActivity.s_cur_group != groupPos) {
+                    MainActivity.s_cur_group = groupPos;
+                    adapter.notifyDataSetChanged();
+                }
+                viewpage.setCurrentItem(childPosition);
                 dialog.dismiss();
             }
         });

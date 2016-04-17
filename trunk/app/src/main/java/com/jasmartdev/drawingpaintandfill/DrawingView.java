@@ -9,29 +9,27 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 public class DrawingView extends View {
 
-    private Paint drawPaint, canvasPaint;
-    private int paintColor = 0xFFFFFFFF;
+    public static Paint drawPaint, canvasPaint;
+    public static int paintColor = 0xFFFFFFFF;
     private final int bgColor = Define.BGCOLOR;
     private int downColor = Define.BGCOLOR, upColor = Define.BGCOLOR;
     private boolean isDrag = false;
     private float down_x;
     private Canvas drawCanvas;
     private Bitmap canvasBitmap;
-    private int imgPos = -1;
-    public static int s_CountNew = 0;
+    private int img = -1;
+    public static int s_CountNew = 1;
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setupDrawing();
     }
 
-    private void setupDrawing() {
+    public static void setupDrawing() {
         drawPaint = new Paint();
         drawPaint.setColor(paintColor);
         drawPaint.setAntiAlias(true);
@@ -46,6 +44,8 @@ public class DrawingView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         drawCanvas = new Canvas(canvasBitmap);
+        Rect dest = new Rect(0, 0, getWidth(), getHeight());
+        drawCanvas.drawBitmap(BitmapFactory.decodeResource(getResources(), img), null, dest, drawPaint);
     }
 
     @Override
@@ -90,7 +90,6 @@ public class DrawingView extends View {
         s_CountNew++;
         drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         invalidate();
-        Log.d("Hoang", "s_CountNew "+s_CountNew);
     }
 
     public void drawImg(int drawable) {
@@ -98,12 +97,8 @@ public class DrawingView extends View {
         drawCanvas.drawBitmap(BitmapFactory.decodeResource(getResources(), drawable), null, dest, drawPaint);
     }
 
-    public void setImgPos(int pos) {
-        imgPos = pos;
-    }
-
-    public int getImgPos() {
-        return imgPos;
+    public void setImg(int pos) {
+        img = pos;
     }
 
     public int getCountNew()
