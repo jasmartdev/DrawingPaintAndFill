@@ -12,8 +12,11 @@ import android.graphics.PathMeasure;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import java.util.Locale;
 
 public class DrawingView extends View {
 
@@ -26,7 +29,7 @@ public class DrawingView extends View {
     private Canvas drawCanvas;
     private Bitmap canvasBitmap;
     private int img = -1;
-    public static int s_CountNew = 1;
+    public static int s_CountChange = 0;
     private boolean ismovefinished, istouchup;
     private float touchX;
     private float touchY;
@@ -178,7 +181,6 @@ public class DrawingView extends View {
     }
 
     public void startNew() {
-        s_CountNew++;
         drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         invalidate();
     }
@@ -192,8 +194,18 @@ public class DrawingView extends View {
         img = pos;
     }
 
-    public static int getCountNew() {
-        return s_CountNew;
+    public static int getCountChange() {
+        return s_CountChange;
+    }
+
+    public static void increaseCountChange() {
+        s_CountChange++;
+        Log.d("Hoang", "increaseCountChange " + s_CountChange);
+    }
+
+    public static void resetCountChange() {
+        s_CountChange = 0;
+        Log.d("Hoang", "resetCountChange " + s_CountChange);
     }
 
     public Bitmap getCanvasBitmap() {
