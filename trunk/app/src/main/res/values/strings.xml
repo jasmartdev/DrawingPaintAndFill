@@ -6,4 +6,7 @@
     <string name="openbg">OpenBg</string>
     <string name="paint">Paint</string>
     <string name="color">Choose Color</string>
+    <string name="ads_banner_id">ca-app-pub-5633074162966218/2553416287</string>
+    <string name="ads_intes_id">ca-app-pub-5633074162966218/5227681085</string>
+    <string name="facebook_app_id">1642256559351305</string>
 </resources>

@@ -21,6 +21,13 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -32,7 +39,6 @@ import java.util.Date;
 
 public class MainActivity extends FragmentActivity implements OnClickListener {
 
-
     private DrawingView drawView;
     private DrawPagerAdapter padapter;
     private ViewPager mViewPager;
@@ -40,20 +46,40 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private int cur_page;
     public static int s_cur_group = 0;
     private AdsManager adsman;
+    CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
+        AppEventsLogger.activateApp(this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+        LoginButton loginButton = (LoginButton) findViewById(R.id.btn_fb_login);
+        loginButton.setReadPermissions("email");
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult login_result) {
+                Log.d("Hoang", "facebook login success");
+            }
+
+            @Override
+            public void onCancel() {
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                Log.d("Hoang", "facebook login onError exception "+ exception);
+            }
+        });
         DrawingView.setupDrawing();
         mViewPager = (ViewPager) findViewById(R.id.pager);
         padapter = new DrawPagerAdapter(getSupportFragmentManager(), this);
         mViewPager.setAdapter(padapter);
-        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
-        {
+        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 initDraw();
@@ -78,8 +104,15 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
-        adsman = new AdsManager(this, "ca-app-pub-5633074162966218/5227681085");
+        adsman = new AdsManager(this, getResources().getString(R.string.ads_intes_id));
         cur_page = mViewPager.getCurrentItem();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        Log.e("data", data.toString());
     }
 
     @Override
@@ -103,6 +136,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     @Override
     protected void onPause() {
         super.onPause();
+        AppEventsLogger.deactivateApp(this);
         Log.d("Hoang", "Main onPause");
     }
 
