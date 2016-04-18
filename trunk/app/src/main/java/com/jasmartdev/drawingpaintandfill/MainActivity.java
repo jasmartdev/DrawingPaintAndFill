@@ -21,10 +21,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,9 +37,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private DrawPagerAdapter padapter;
     private ViewPager mViewPager;
     private ImageButton currPaint, btn_new, btn_open_bg, btn_save, btn_effect;
-    private InterstitialAd adViewInters;
     private int cur_page;
     public static int s_cur_group = 0;
+    private AdsManager adsman;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +54,13 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         mViewPager.setAdapter(padapter);
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
         {
-
             @Override
             public void onPageSelected(int position) {
                 initDraw();
-                if ((DrawingView.getCountNew() % 3 == 0) && adViewInters.isLoaded()) {
-                    adViewInters.show();
+                if ((DrawingView.getCountChange() > 3)) {
+                    adsman.showAds();
+                } else {
+                    DrawingView.increaseCountChange();
                 }
             }
         });
@@ -79,14 +78,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
-        adViewInters = new InterstitialAd(this);
-        adViewInters.setAdUnitId("ca-app-pub-5633074162966218/5227681085");
-        adViewInters.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                super.onAdClosed();
-            }
-        });
+        adsman = new AdsManager(this, "ca-app-pub-5633074162966218/5227681085");
         cur_page = mViewPager.getCurrentItem();
     }
 
@@ -127,6 +119,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     }
 
     public void paintClicked(View view) {
+        initDraw();
         if (view != currPaint) {
             ImageButton imgView = (ImageButton) view;
             String color = view.getTag().toString();
@@ -139,6 +132,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     @Override
     public void onClick(View view) {
+        initDraw();
         if (view.getId() == R.id.btn_new) {
             AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
             newDialog.setTitle("New drawing");
@@ -147,12 +141,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 public void onClick(DialogInterface dialog, int which) {
                     drawView.startNew();
                     dialog.dismiss();
-                    if (!adViewInters.isLoaded()) {
-                        AdRequest adRequest = new AdRequest.Builder().build();
-                        adViewInters.loadAd(adRequest);
-                    }
-                    if ((drawView.getCountNew() % 3 == 0) && adViewInters.isLoaded()) {
-                        adViewInters.show();
+                    if ((DrawingView.getCountChange() > 3)) {
+                        adsman.showAds();
+                    } else {
+                        DrawingView.increaseCountChange();
                     }
                 }
             });
@@ -174,12 +166,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             ExpAdapter = new BgImgChooseExpandListAdapter(seekDialog.getContext(), ExpListItems, seekDialog, mViewPager, padapter);
             ExpandList.setAdapter(ExpAdapter);
             seekDialog.show();
-            if (!adViewInters.isLoaded()) {
-                AdRequest adRequest = new AdRequest.Builder().build();
-                adViewInters.loadAd(adRequest);
-            }
-            if ((drawView.getCountNew() % 3 == 0) && adViewInters.isLoaded()) {
-                adViewInters.show();
+            if ((DrawingView.getCountChange() > 3)) {
+                adsman.showAds();
+            } else {
+                DrawingView.increaseCountChange();
             }
         } else if (view.getId() == R.id.btn_save) {
             AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
@@ -276,13 +266,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     }
 
     private void initDraw() {
-        Log.d("Hoang", "initDraw drawView:" + drawView + " cur_page " + cur_page + " mViewPager.getCurrentItem() " + mViewPager.getCurrentItem());
         if (drawView == null || cur_page != mViewPager.getCurrentItem()) {
             int index = mViewPager.getCurrentItem();
             SlideFragment sfm = (SlideFragment) padapter.getRegisteredFragment(index);
             drawView = sfm.getDrawView();
             cur_page = mViewPager.getCurrentItem();
-            Log.d("Hoang", "initDraw 222 drawView:" + drawView + " sfm " + sfm + " cur_page " + cur_page);
         }
     }
 }
