@@ -28,6 +28,8 @@ import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareButton;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -72,7 +74,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
             @Override
             public void onError(FacebookException exception) {
-                Log.d("Hoang", "facebook login onError exception "+ exception);
+                Log.d("Hoang", "facebook login onError exception " + exception);
             }
         });
         DrawingView.setupDrawing();
@@ -106,6 +108,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         mAdView.loadAd(adRequest);
         adsman = new AdsManager(this, getResources().getString(R.string.ads_intes_id));
         cur_page = mViewPager.getCurrentItem();
+        ShareLinkContent content = new ShareLinkContent.Builder().setContentTitle("Fill color app").setContentDescription("Testing").setContentUrl(Uri.parse("https://www.facebook.com/kukumi111")).build();
+        ShareButton shareButton = (ShareButton) findViewById(R.id.btn_fb_share);
+        shareButton.setShareContent(content);
     }
 
     @Override
